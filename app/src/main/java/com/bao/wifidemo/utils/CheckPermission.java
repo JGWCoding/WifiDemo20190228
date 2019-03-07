@@ -61,7 +61,8 @@ public abstract class CheckPermission
                 case REQUEST_CODE_PERMISSION_LOCATION:
                     AndPermission.with(activity)
                             .requestCode(REQUEST_CODE_PERMISSION_LOCATION)
-                            .permission(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.CHANGE_WIFI_STATE)
+                            .permission(Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.CHANGE_WIFI_STATE,
+                                    Manifest.permission.WAKE_LOCK,Manifest.permission.ACCESS_NETWORK_STATE,Manifest.permission.WRITE_EXTERNAL_STORAGE)
                             .callback(permissionListener)
                             // rationale作用是：用户拒绝一次权限，再次申请时先征求用户同意，再打开授权对话框；
                             // 这样避免用户勾选不再提示，导致以后无法申请权限。

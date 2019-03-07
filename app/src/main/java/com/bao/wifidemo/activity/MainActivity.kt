@@ -27,6 +27,8 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         findViewById<TextView>(R.id.tv_wifi_control).setOnClickListener(this@MainActivity)
         findViewById<TextView>(R.id.tv_wifi_tcp).setOnClickListener(this@MainActivity)
         findViewById<TextView>(R.id.tv_wifi_udp).setOnClickListener(this@MainActivity)
+        findViewById<TextView>(R.id.tv_wifi_chat).setOnClickListener(this@MainActivity)
+        findViewById<TextView>(R.id.tv_connect_wifi).setOnClickListener(this@MainActivity)
     }
 
     override fun onClick(view: View?) {
@@ -41,6 +43,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
 
             R.id.tv_wifi_udp -> {
                 startActivity(WifiUdpActivity::class.java)
+            }
+            R.id.tv_wifi_chat->{
+                startActivity(WifiImChatActivity::class.java)
+            }
+            R.id.tv_connect_wifi->{
+                startActivity(WifiConnectActivity::class.java)
             }
         }
     }

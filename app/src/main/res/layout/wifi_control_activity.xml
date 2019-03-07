@@ -63,7 +63,7 @@
         android:layout_width="match_parent"
         android:id="@+id/et_wifi_name"
         android:background="@null"
-        android:text="bao_phone"
+        android:text="toppine"
         android:padding="@dimen/control_tv_padding"
         android:hint="@string/wifi_name"
         android:maxLines="1"
@@ -74,7 +74,7 @@
     <EditText
         android:layout_width="match_parent"
         android:id="@+id/et_wifi_pwd"
-        android:text="baozi888888"
+        android:text="Toppine123"
         android:background="@null"
         android:padding="@dimen/control_tv_padding"
         android:hint="@string/wifi_pwd"

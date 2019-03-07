@@ -1,7 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-
+def releaseTime() {
+    return new Date().format("yyyy-MM-dd", TimeZone.getTimeZone("UTC")).toString()
+}
 android {
+    def date = "\"time : " + releaseTime()+"\"";
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.bao.wifidemo"
@@ -11,11 +14,47 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    buildTypes {
+    signingConfigs {
+//        debug {
+//            storeFile file("../RRFapp.jks")
+//            storePassword "qqqqqq"
+//            keyAlias "rrf"
+//            keyPassword "qqqqqq"
+//            v2SigningEnabled false
+//        }
         release {
+            storeFile file("../RRFapp.jks")
+            storePassword "qqqqqq"
+            keyAlias "rrf"
+            keyPassword "qqqqqq"
+            v2SigningEnabled false
+        }
+    }
+    buildTypes {
+        debug {
+            buildConfigField("String", "date", "${date}")   //
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
         }
+        release {
+            buildConfigField("String", "date", "${date}")
+            minifyEnabled false          //混淆
+            zipAlignEnabled true       //zip压缩
+//            shrinkResources true    //超过res限制
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            applicationVariants.all { variant ->
+                variant.outputs.all { output ->
+                    def outputFile = output.outputFile
+                    if (outputFile != null && outputFile.name.endsWith('.apk')) {
+                        def fileName = "wifidemo_${getName()}_${defaultConfig.versionName}_${defaultConfig.versionCode}_${releaseTime()}.apk"
+                        outputFileName = fileName
+                    }
+                }
+            }
+        }
+
     }
 }
 

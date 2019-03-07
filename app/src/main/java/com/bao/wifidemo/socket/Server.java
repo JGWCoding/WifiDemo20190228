@@ -6,10 +6,9 @@ import android.os.Message;
 import com.bao.wifidemo.utils.Constants;
 import com.blankj.utilcode.util.LogUtils;
 
-import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -19,13 +18,13 @@ import java.net.Socket;
  *
  * @author Administrator
  */
-public class ServerLastly implements Runnable {
+public class Server implements Runnable {
     private static final String TAG = "tcp_server";
     public static final int SERVER_ARG = 0x11;
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private PrintWriter printWriter;
-    private BufferedReader bufferedReader;
+    private DataOutputStream printWriter;
+    private DataInputStream bufferedReader;
 
     private Handler handler;
 
@@ -34,7 +33,7 @@ public class ServerLastly implements Runnable {
      * 我在activity的onCreate()中创建示例，如果将连接代码 写在构造方法中，服务端会一直等待客户端连接，界面没有去描绘，会一直出现白屏。
      * 直到客户端连接上了，界面才会描绘出来。原因是构造方法阻塞了主线程，要另开一个线程。在这里我将它写在了run()中。
      */
-    public ServerLastly(Handler handler) {
+    public Server(Handler handler) {
         this.handler = handler;
 //        Log.i(TAG, "Server=======打开服务=========");
 //        try {
@@ -57,9 +56,13 @@ public class ServerLastly implements Runnable {
     public void send(String data) {
         LogUtils.iTag(TAG, "服务端发送：" + data);
         if (printWriter != null) {
-            printWriter.println(data);
-            printWriter.flush();
-        }else{
+            try {
+                printWriter.writeUTF(data);
+                printWriter.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
             LogUtils.iTag(TAG, "服务端输出流有问题");
         }
     }
@@ -69,13 +72,14 @@ public class ServerLastly implements Runnable {
     public void run() {
         LogUtils.iTag(TAG, "=======打开服务=========");
         try {
-            serverSocket = new ServerSocket(Constants.INSTANCE.getHOST_PORT());
+            serverSocket = new ServerSocket(Constants.INSTANCE.getHOST_PORT()); //设置端口,最好不要有跟别的app重复的
+            serverSocket.setSoTimeout(0);//设置超时时间为无限制 0,代表无限制 other:代表这个时间段不开启通信会不再接受信息
             clientSocket = serverSocket.accept();//一直等待连接成功
             LogUtils.iTag(TAG, "======客户端连接成功=========");
             InetAddress inetAddress = clientSocket.getInetAddress();
             String ip = inetAddress.getHostAddress();
-            printWriter = new PrintWriter(clientSocket.getOutputStream());
-            bufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            printWriter = new DataOutputStream(clientSocket.getOutputStream());
+            bufferedReader = new DataInputStream(clientSocket.getInputStream());
             LogUtils.iTag(TAG, "客户端ID为:" + ip);
 
         } catch (IOException e) {
@@ -85,36 +89,15 @@ public class ServerLastly implements Runnable {
 
 
         try {
-//            if (bufferedReader != null &&!TextUtils.isEmpty(bufferedReader.readLine())) {
-//                String result = "";
-//                while ((result = bufferedReader.readLine()) != null) {//readLine方法有线程锁,readLine读取了数据并把数据清除
-//                    LogUtils.iTag(TAG, "服务端接到的数据为：" + result);
-//                    //把数据带回activity显示
-//                    Message msg = handler.obtainMessage();
-//                    msg.obj = result;
-//                    msg.arg1 = SERVER_ARG;
-//                    handler.sendMessage(msg);
-//                }
-//                LogUtils.dTag(TAG, "服务端关闭"+result );
-//            }else{
-//                LogUtils.iTag(TAG, "服务端关闭");
-//                close();
-//            }
-            if (bufferedReader != null) {
-                String result = "";
-                char[] chars=new char[8*10];
-                while ((result=bufferedReader.readLine())!=null) {  //这个有一个问题是如果有换行只会读取一行再读取一行,不能全部读取过来
-                    LogUtils.iTag(TAG, "服务端接到的数据为：" + result);
-                    //把数据带回activity显示
-                    Message msg = handler.obtainMessage();
-                    msg.obj = result;
-                    msg.arg1 = SERVER_ARG;
-                    handler.sendMessage(msg);
-                }
-                LogUtils.dTag(TAG, "服务端关闭"+result );
-            }else{
-                LogUtils.iTag(TAG, "服务端关闭");
-                close();
+            DataInputStream input = new DataInputStream(clientSocket.getInputStream());
+            String result = "";
+            while ((result = input.readUTF()) != null) {
+                LogUtils.iTag(TAG, "服务端接到的数据为：" + result);
+//把数据带回activity显示
+                Message msg = handler.obtainMessage();
+                msg.obj = result;
+                msg.arg1 = SERVER_ARG;
+                handler.sendMessage(msg);
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block

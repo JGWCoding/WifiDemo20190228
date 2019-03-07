@@ -83,8 +83,8 @@ public class WifiControlActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         //移除指定wifi
-        wifiControlUtils.removeWifi(Constants.INSTANCE.getWIFI_NAME());
-        wifiControlUtils.addNetWork(wifiInfo.getSSID());
+//        wifiControlUtils.removeWifi(Constants.INSTANCE.getWIFI_NAME());
+//        wifiControlUtils.addNetWork(wifiInfo.getSSID());
     }
 
 

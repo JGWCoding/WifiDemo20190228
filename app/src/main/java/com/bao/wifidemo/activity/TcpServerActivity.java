@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.bao.wifidemo.R;
 import com.bao.wifidemo.socket.ServerLastly;
+import com.blankj.utilcode.util.LogUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -39,13 +40,26 @@ public class TcpServerActivity extends AppCompatActivity
         {
             if (msg.arg1 == ServerLastly.SERVER_ARG)
             {
+                LogUtils.i("接收到："+(String) msg.obj);
                 receiveData.append("接收到："+(String) msg.obj);
                 tvMessage.setText(receiveData);
                 receiveData.append("\r\n");
             }
             return false;
         }
-    });
+    }){
+        @Override
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+            if (msg.arg1 == ServerLastly.SERVER_ARG)
+            {
+                LogUtils.i("接收到："+(String) msg.obj);
+                receiveData.append("接收到："+(String) msg.obj);
+                tvMessage.setText(receiveData);
+                receiveData.append("\r\n");
+            }
+        }
+    };
 
 
     @Override

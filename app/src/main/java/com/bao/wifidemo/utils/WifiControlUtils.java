@@ -21,7 +21,7 @@ public class WifiControlUtils {
     static final public int WIFI_CIPHER_NPW = 0;
     //WEP加密
     static final public int WIFI_CIPHER_WEP = 1;
-    //WAP加密 ---- 大部分使用wap加密
+    //WAP加密 ---- 大部分使用wap加密 ---  现在都是wap2协议
     static final public int WIFI_CIPHER_WAP = 2;
 
     private WifiManager mWifiManager;
@@ -35,7 +35,9 @@ public class WifiControlUtils {
 
     public WifiControlUtils(Context context) {
         //获取wifiManager对象
-        mWifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        if (mWifiManager==null) {
+            mWifiManager = (WifiManager) context.getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        }
     }
 
     /**
@@ -65,6 +67,17 @@ public class WifiControlUtils {
             return mWifiManager.getConnectionInfo();
         }
         return null;
+    }
+    /**
+     * wifi获取 路由ip地址
+     *
+     * @param context
+     * @return
+     */
+    public static String getWIFILocalIpAdress(Context context) {
+        WifiManager wifi_service = (WifiManager) context.getSystemService(Context.WIFI_SERVICE);
+        WifiInfo wifiinfo = wifi_service.getConnectionInfo();
+        return formatIpAddress(wifiinfo.getIpAddress());
     }
     public  String getWIFILocalIpAdress() { //得到本地网关地址
         int ipAddress = getWifiInfo().getIpAddress();
@@ -105,6 +118,7 @@ public class WifiControlUtils {
         mWifiManager.startScan();
         //得到扫描结果
         wifiList = mWifiManager.getScanResults();
+
         //得到配置过的网络
         wifiConfigurationList = mWifiManager.getConfiguredNetworks();
     }
@@ -191,7 +205,21 @@ public class WifiControlUtils {
         //无论是否连接上，都返回true。。。。
         mWifiManager.enableNetwork(netId, true);
     }
+    public void createNetWork(String SSID, String password, int Type) {
+        int netId = -1;
+            //删除不成功，要么这个wifi配置以前就存在过，要么是还没连接过的
+            if (getExitsWifiConfig(SSID) != null) {
+                //这个wifi是连接过的，如果这个wifi在连接之后改了密码，那就只能手动去删除了
+                netId = getExitsWifiConfig(SSID).networkId;
+            } else {
+                //没连接过的，新建一个wifi配置
+                netId = mWifiManager.addNetwork(createWifiInfo(SSID, password, Type));
+            }
 
+        //这个方法的第一个参数是需要连接wifi网络的networkId，第二个参数是指连接当前wifi网络是否需要断开其他网络
+        //无论是否连接上，都返回true。。。。
+        mWifiManager.enableNetwork(netId, true);
+    }
     /**
      * 获取配置过的wifiConfiguration
      */
@@ -296,7 +324,7 @@ public class WifiControlUtils {
             config.wepTxKeyIndex = 0;
         }
         //WPA加密
-        else if (Type == WIFI_CIPHER_WAP) //WIFICIPHER_WPA
+        else if (Type == WIFI_CIPHER_WAP) //WIFICIPHER_WPA2
         {
             config.preSharedKey = "\"" + password + "\"";
             config.hiddenSSID = true;

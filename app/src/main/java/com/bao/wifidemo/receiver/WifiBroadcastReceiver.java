@@ -19,7 +19,7 @@ import com.blankj.utilcode.util.ToastUtils;
 public class WifiBroadcastReceiver extends BroadcastReceiver
 {
     private WifiControlUtils wifiControlUtils;
-
+public static SupplicantState state =   SupplicantState.DISCONNECTED;
     @Override
     public void onReceive(Context context, Intent intent)
     {
@@ -68,6 +68,7 @@ public class WifiBroadcastReceiver extends BroadcastReceiver
         } else if (WifiManager.SUPPLICANT_STATE_CHANGED_ACTION.equals(intent.getAction()))
         {
             SupplicantState netNewState = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+            state = netNewState;
             if (SupplicantState.FOUR_WAY_HANDSHAKE==netNewState){
                 //重新连接wifi,如果密码正确的话,会依次接受以下状态
                 // ASSOCIATING正在连接 ASSOCIATED交互  FOUR_WAY_HANDSHAKE四次握手  GROUP_HANDSHAKE组握手 COMPLETED完成

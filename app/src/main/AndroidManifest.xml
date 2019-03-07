@@ -10,8 +10,16 @@
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
     <!-- 6.0以上打开蓝牙和wifi最好加上定位权限，获取wifi列表要用 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+
     <!-- 获取IP地址 -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+    <!--使wifi在息屏情况下不断wifi-->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name=".application.BaseApplication"
@@ -53,7 +61,12 @@
             android:name=".activity.TcpClientActivity"
             android:label="@string/tcp_client"
             android:screenOrientation="portrait" />
-
+        <activity android:name=".activity.WifiImChatActivity"
+            android:label="@string/tcp_chat"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".activity.WifiConnectActivity"
+            android:label="wifi连接"
+            android:screenOrientation="portrait"/>
     </application>
 
 </manifest>
